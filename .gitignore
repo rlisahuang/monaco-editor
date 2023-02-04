@@ -2,3 +2,12 @@
 **/out/
 **/release/
 /test/manual/generated/**
+/.idea/
+/*.iml
+dist/*.js
+dist/fonts/*
+out-ci/
+.DS_Store
+vscode
+/typings-test
+yarn.lock
