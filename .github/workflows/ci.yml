@@ -1,54 +1,57 @@
-name: Build
+name: CI
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  schedule:
-    - cron:  '0 8 * * *'
+on: [push, pull_request]
 
 jobs:
   build:
-    name: Smoke Test
-    # This job runs on Linux
+    name: CI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: microsoft/playwright-github-action@v1
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
         with:
-          node-version: 10.x
-      - name: Checkout VS Code
-        run: git clone --depth 1 https://github.com/microsoft/vscode vscode
-      - name: VS Code yarn & Editor Distro
-        working-directory: ./vscode
-        run: |
-          yarn
-          yarn gulp editor-distro
-      - name: Typings validation prep
-        run: |
-          mkdir typings-test
-      - name: Typings validation
-        working-directory: ./typings-test
-        run: |
-          yarn init -yp
-          yarn add typescript
-          yarn tsc --init
-          echo "import '../vscode/out-monaco-editor-core';" > a.ts
-          yarn tsc --noEmit
-      - name: NPM Install
-        run: npm install
-      - name: Webpack Bundle
-        run: |
-          npm run bundle
-      - name: Build Tests
-        run: npm run build-test
-      - name: Run Smoke Test
-        run: |
-          npm run ciserver &
-          sleep 10
-          BROWSER=chromium npm run test
-          BROWSER=firefox npm run test
-          BROWSER=webkit npm run test
+          node-version: 14
+
+      - name: Cache node modules
+        id: cacheNodeModules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-cacheNodeModules2-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-cacheNodeModules2-
+
+      - name: execute `npm ci` (1)
+        if: ${{ steps.cacheNodeModules.outputs.cache-hit != 'true' }}
+        run: npm ci
+
+      - name: execute `npm ci` (2)
+        if: ${{ steps.cacheNodeModules.outputs.cache-hit != 'true' }}
+        run: npm ci --prefix webpack-plugin
+
+      - name: Install Playwright
+        run: npm run playwright-install
+
+      - name: Install OS Dependencies for Playwright
+        run: sudo npm run playwright-install-deps
+
+      - name: Check prettier
+        run: npm run prettier-check
+
+      - name: Build
+        run: npm run release
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Compile webpack plugin
+        run: npm run compile --prefix webpack-plugin
+
+      - name: Package using webpack plugin
+        run: npm run smoketest --prefix webpack-plugin
+
+      - name: Run smoke test
+        run: npm run smoketest
+
+      - name: Build website
+        run: npm run build-website

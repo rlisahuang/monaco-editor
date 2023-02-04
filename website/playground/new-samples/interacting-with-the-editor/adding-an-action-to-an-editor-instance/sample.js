@@ -1,4 +1,4 @@
-var editor = monaco.editor.create(document.getElementById("container"), {
+var editor = monaco.editor.create(document.getElementById('container'), {
 	value: [
 		'',
 		'class Example {',
@@ -9,11 +9,11 @@ var editor = monaco.editor.create(document.getElementById("container"), {
 		'\t}',
 		'}'
 	].join('\n'),
-	language: "typescript"
+	language: 'typescript'
 });
 
 // Explanation:
-// Press F1 (Alt-F1 in Edge) => the action will appear and run if it is enabled
+// Press F1 => the action will appear and run if it is enabled
 // Press Ctrl-F10 => the action will run if it is enabled
 // Press Chord Ctrl-K, Ctrl-M => the action will run if it is enabled
 
@@ -28,7 +28,10 @@ editor.addAction({
 	keybindings: [
 		monaco.KeyMod.CtrlCmd | monaco.KeyCode.F10,
 		// chord
-		monaco.KeyMod.chord(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_K, monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_M)
+		monaco.KeyMod.chord(
+			monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK,
+			monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM
+		)
 	],
 
 	// A precondition for this action.
@@ -42,9 +45,8 @@ editor.addAction({
 	contextMenuOrder: 1.5,
 
 	// Method that will be executed when the action is triggered.
-	// @param editor The editor instance is passed in as a convinience
-	run: function(ed) {
+	// @param editor The editor instance is passed in as a convenience
+	run: function (ed) {
 		alert("i'm running => " + ed.getPosition());
-		return null;
 	}
 });

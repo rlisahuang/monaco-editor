@@ -1,10 +1,11 @@
-var editor = monaco.editor.create(document.getElementById("container"), {
+var editor = monaco.editor.create(document.getElementById('container'), {
 	value: "function hello() {\n\talert('Hello world!');\n}",
-	language: "javascript"
+	language: 'javascript'
 });
 
-var myBinding = editor.addCommand(monaco.KeyCode.F9, function() {
+var myBinding = editor.addCommand(monaco.KeyCode.F9, function () {
 	alert('F9 pressed!');
 });
 
-// When cleaning up remember to call myBinding.dispose()
+// You can't dispose `addCommand`
+// If you need to dispose it you might use `addAction` or `registerCommand`
