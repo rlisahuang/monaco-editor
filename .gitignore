@@ -11,3 +11,6 @@ out-ci/
 vscode
 /typings-test
 yarn.lock
+/test/smoke/vite/dist/**
+/test/smoke/parcel/dist/**
+/test/smoke/parcel/.cache/**

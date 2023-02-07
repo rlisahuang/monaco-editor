@@ -11,7 +11,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
 
       - name: Cache node modules
         id: cacheNodeModules
@@ -48,7 +48,16 @@ jobs:
         run: npm run compile --prefix webpack-plugin
 
       - name: Package using webpack plugin
-        run: npm run package-for-smoketest --prefix webpack-plugin
+        run: npm run package-for-smoketest-webpack
+
+      - name: Package using esbuild
+        run: npm run package-for-smoketest-esbuild
+
+      - name: Package using vite
+        run: npm run package-for-smoketest-vite
+
+      - name: Package using parcel
+        run: npm run package-for-smoketest-parcel --prefix test/smoke/parcel
 
       - name: Run smoke test
         run: npm run smoketest

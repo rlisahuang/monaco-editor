@@ -64,9 +64,8 @@ generateMetadata();
 
 /**
  * Release to `dev` or `min`.
- * @param {'dev'|'min'} type
  */
-function AMD_releaseOne(type) {
+function AMD_releaseOne(type: 'dev' | 'min') {
 	const coreFiles = readFiles(`node_modules/monaco-editor-core/${type}/**/*`, {
 		base: `node_modules/monaco-editor-core/${type}`
 	});
@@ -365,7 +364,16 @@ function toExternalDTS(contents: string): string {
 		}
 
 		if (line.indexOf('declare let MonacoEnvironment') === 0) {
-			lines[i] = `declare global {\n    let MonacoEnvironment: Environment | undefined;\n}`;
+			lines[i] = [
+				'declare global {',
+				'    let MonacoEnvironment: Environment | undefined;',
+				'',
+				'    interface Window {',
+				'        MonacoEnvironment?: Environment | undefined;',
+				'    }',
+				'}',
+				''
+			].join('\n');
 		}
 		if (line.indexOf('    MonacoEnvironment?') === 0) {
 			lines[i] = `    MonacoEnvironment?: Environment | undefined;`;

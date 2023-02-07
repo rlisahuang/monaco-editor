@@ -56,18 +56,13 @@ export function removeDir(_dirPath: string, keep?: (filename: string) => boolean
 	rmDir(dirPath, _dirPath);
 	console.log(`Deleted ${_dirPath}`);
 
-	/**
-	 * @param {string} dirPath
-	 * @param {string} relativeDirPath
-	 * @returns {boolean}
-	 */
-	function rmDir(dirPath, relativeDirPath) {
+	function rmDir(dirPath: string, relativeDirPath: string): boolean {
 		let keepsFiles = false;
 		const entries = fs.readdirSync(dirPath);
 		for (const entry of entries) {
 			const filePath = path.join(dirPath, entry);
 			const relativeFilePath = path.join(relativeDirPath, entry);
-			if (keep(relativeFilePath)) {
+			if (keep!(relativeFilePath)) {
 				keepsFiles = true;
 				continue;
 			}
