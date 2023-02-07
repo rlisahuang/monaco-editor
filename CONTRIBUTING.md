@@ -13,6 +13,8 @@ This repository contains source code only for Monaco Editor Languages, the core 
 
 ## Contributing a new tokenizer / a new language
 
+Please understand that we only bundle languages with the monaco editor that have a significant relevance (for example, those that have an article in Wikipedia).
+
 - create `$/src/basic-languages/{myLang}/{myLang}.contribution.ts`
 - create `$/src/basic-languages/{myLang}/{myLang}.ts`
 - create `$/src/basic-languages/{myLang}/{myLang}.test.ts`
@@ -71,7 +73,7 @@ Open [http://localhost:8080/monaco-editor/test/manual/?editor=src](http://localh
 /src/monaco-editor> npm run compile --prefix webpack-plugin
 
 # package using the webpack plugin
-/src/monaco-editor> npm run smoketest --prefix webpack-plugin
+/src/monaco-editor> npm run package-for-smoketest --prefix webpack-plugin
 
 # run the smoketest
 /src/monaco-editor> npm run smoketest-debug
