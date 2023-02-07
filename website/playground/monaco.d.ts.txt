@@ -1380,6 +1380,7 @@ declare namespace monaco.editor {
         startColumn: number;
         endLineNumber: number;
         endColumn: number;
+        modelVersionId?: number;
         relatedInformation?: IRelatedInformation[];
         tags?: MarkerTag[];
     }
@@ -1399,6 +1400,7 @@ declare namespace monaco.editor {
         startColumn: number;
         endLineNumber: number;
         endColumn: number;
+        modelVersionId?: number;
         relatedInformation?: IRelatedInformation[];
         tags?: MarkerTag[];
     }
@@ -1870,12 +1872,12 @@ declare namespace monaco.editor {
          * @param range The range describing what text length to get.
          * @return The text length.
          */
-        getValueLengthInRange(range: IRange): number;
+        getValueLengthInRange(range: IRange, eol?: EndOfLinePreference): number;
         /**
          * Get the character count of text in a certain range.
          * @param range The range describing what text length to get.
          */
-        getCharacterCountInRange(range: IRange): number;
+        getCharacterCountInRange(range: IRange, eol?: EndOfLinePreference): number;
         /**
          * Get the number of lines in the model.
          */
@@ -3235,10 +3237,6 @@ declare namespace monaco.editor {
          */
         smartSelect?: ISmartSelectOptions;
         /**
-         * Smart select opptions;
-         */
-        smartSelect?: ISmartSelectOptions;
-        /**
          *
          */
         gotoLocation?: IGotoLocationOptions;
@@ -4383,12 +4381,6 @@ declare namespace monaco.editor {
         selectLeadingAndTrailingWhitespace?: boolean;
     }
 
-    export interface ISmartSelectOptions {
-        selectLeadingAndTrailingWhitespace?: boolean;
-    }
-
-    export type SmartSelectOptions = Readonly<Required<ISmartSelectOptions>>;
-
     /**
      * Describes how to indent wrapped lines.
      */
@@ -4696,13 +4688,13 @@ declare namespace monaco.editor {
         wordWrapColumn: IEditorOption<EditorOption.wordWrapColumn, number>;
         wordWrapOverride1: IEditorOption<EditorOption.wordWrapOverride1, 'on' | 'off' | 'inherit'>;
         wordWrapOverride2: IEditorOption<EditorOption.wordWrapOverride2, 'on' | 'off' | 'inherit'>;
-        wrappingIndent: IEditorOption<EditorOption.wrappingIndent, WrappingIndent>;
-        wrappingStrategy: IEditorOption<EditorOption.wrappingStrategy, 'simple' | 'advanced'>;
         editorClassName: IEditorOption<EditorOption.editorClassName, string>;
         pixelRatio: IEditorOption<EditorOption.pixelRatio, number>;
         tabFocusMode: IEditorOption<EditorOption.tabFocusMode, boolean>;
         layoutInfo: IEditorOption<EditorOption.layoutInfo, EditorLayoutInfo>;
         wrappingInfo: IEditorOption<EditorOption.wrappingInfo, EditorWrappingInfo>;
+        wrappingIndent: IEditorOption<EditorOption.wrappingIndent, WrappingIndent>;
+        wrappingStrategy: IEditorOption<EditorOption.wrappingStrategy, 'simple' | 'advanced'>;
     };
 
     type EditorOptionsType = typeof EditorOptions;
@@ -4838,10 +4830,11 @@ declare namespace monaco.editor {
          */
         position: IPosition | null;
         /**
-         * Optionally, a range can be provided to further
-         * define the position of the content widget.
+         * Optionally, a secondary position can be provided to further
+         * define the position of the content widget. The secondary position
+         * must have the same line number as the primary position.
          */
-        range?: IRange | null;
+        secondaryPosition?: IPosition | null;
         /**
          * Placement preference for position, in order of preference.
          */
@@ -7472,6 +7465,10 @@ declare namespace monaco.worker {
 
 //dtsv=3
 
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
 declare namespace monaco.languages.css {
     export interface CSSFormatConfiguration {
@@ -7958,8 +7955,7 @@ declare namespace monaco.languages.typescript {
         ES2015 = 5,
         ESNext = 99
     }
-
-    enum JsxEmit {
+    export enum JsxEmit {
         None = 0,
         Preserve = 1,
         React = 2,
@@ -7967,12 +7963,11 @@ declare namespace monaco.languages.typescript {
         ReactJSX = 4,
         ReactJSXDev = 5
     }
-    enum NewLineKind {
+    export enum NewLineKind {
         CarriageReturnLineFeed = 0,
         LineFeed = 1
     }
-
-    enum ScriptTarget {
+    export enum ScriptTarget {
         ES3 = 0,
         ES5 = 1,
         ES2015 = 2,
@@ -7983,14 +7978,12 @@ declare namespace monaco.languages.typescript {
         ES2020 = 7,
         ESNext = 99,
         JSON = 100,
-        Latest = ESNext,
+        Latest = 99
     }
-
     export enum ModuleResolutionKind {
         Classic = 1,
         NodeJs = 2
     }
-
     interface MapLike<T> {
         [index: string]: T;
     }
@@ -8078,7 +8071,6 @@ declare namespace monaco.languages.typescript {
         useDefineForClassFields?: boolean;
         [option: string]: CompilerOptionsValue | undefined;
     }
-
     export interface DiagnosticsOptions {
         noSemanticValidation?: boolean;
         noSyntaxValidation?: boolean;
@@ -8107,11 +8099,9 @@ declare namespace monaco.languages.typescript {
         content: string;
         version: number;
     }
-
-    interface IExtraLibs {
+    export interface IExtraLibs {
         [path: string]: IExtraLib;
     }
-
     /**
      * A linked list of formatted diagnostic messages to be used as part of a multiline message.
      * It is built from the bottom up, leaving the head to be the "main" diagnostic.
@@ -8123,7 +8113,7 @@ declare namespace monaco.languages.typescript {
         code: number;
         next?: DiagnosticMessageChain[];
     }
-    interface Diagnostic extends DiagnosticRelatedInformation {
+    export interface Diagnostic extends DiagnosticRelatedInformation {
         /** May store more in future. For now, this will simply be `true` to indicate when a diagnostic is an unused-identifier diagnostic. */
         reportsUnnecessary?: {};
         reportsDeprecated?: {};
@@ -8142,7 +8132,6 @@ declare namespace monaco.languages.typescript {
         length: number | undefined;
         messageText: string | DiagnosticMessageChain;
     }
-
     interface EmitOutput {
         outputFiles: OutputFile[];
         emitSkipped: boolean;
@@ -8152,13 +8141,11 @@ declare namespace monaco.languages.typescript {
         writeByteOrderMark: boolean;
         text: string;
     }
-
     export interface LanguageServiceDefaults {
         /**
          * Event fired when compiler options or diagnostics options are changed.
          */
         readonly onDidChange: IEvent<void>;
-
         /**
          * Event fired when extra libraries registered with the language service change.
          */
@@ -8169,7 +8156,6 @@ declare namespace monaco.languages.typescript {
          * Get the current extra libs registered with the language service.
          */
         getExtraLibs(): IExtraLibs;
-
         /**
          * Add an additional source file to the language service. Use this
          * for typescript (definition) files that won't be loaded as editor
@@ -8181,7 +8167,6 @@ declare namespace monaco.languages.typescript {
          * language service upon disposal.
          */
         addExtraLib(content: string, filePath?: string): IDisposable;
-
         /**
          * Remove all existing extra libs and set the additional source
          * files to the language service. Use this for typescript definition
@@ -8196,34 +8181,32 @@ declare namespace monaco.languages.typescript {
          * Get current TypeScript compiler options for the language service.
          */
         getCompilerOptions(): CompilerOptions;
-
         /**
          * Set TypeScript compiler options.
          */
         setCompilerOptions(options: CompilerOptions): void;
-
         /**
          * Get the current diagnostics options for the language service.
          */
         getDiagnosticsOptions(): DiagnosticsOptions;
-
         /**
          * Configure whether syntactic and/or semantic validation should
          * be performed
          */
         setDiagnosticsOptions(options: DiagnosticsOptions): void;
-
+        /**
+         * Configure webworker options
+         */
+        setWorkerOptions(options: WorkerOptions): void;
         /**
          * No-op.
          */
         setMaximumWorkerIdleTime(value: number): void;
-
         /**
          * Configure if all existing models should be eagerly sync'd
          * to the worker on start or restart.
          */
         setEagerModelSync(value: boolean): void;
-
         /**
          * Get the current setting for whether all existing models should be eagerly sync'd
          * to the worker on start or restart.
@@ -8234,35 +8217,33 @@ declare namespace monaco.languages.typescript {
          */
         setInlayHintsOptions(options: InlayHintsOptions): void;
     }
-
     export interface TypeScriptWorker {
         /**
          * Get diagnostic messages for any syntax issues in the given file.
          */
         getSyntacticDiagnostics(fileName: string): Promise<Diagnostic[]>;
-
         /**
          * Get diagnostic messages for any semantic issues in the given file.
          */
         getSemanticDiagnostics(fileName: string): Promise<Diagnostic[]>;
-
         /**
          * Get diagnostic messages for any suggestions related to the given file.
          */
         getSuggestionDiagnostics(fileName: string): Promise<Diagnostic[]>;
-
+        /**
+         * Get the content of a given file.
+         */
+        getScriptText(fileName: string): Promise<string | undefined>;
         /**
          * Get diagnostic messages related to the current compiler options.
          * @param fileName Not used
          */
         getCompilerOptionsDiagnostics(fileName: string): Promise<Diagnostic[]>;
-
         /**
          * Get code completions for the given file and position.
          * @returns `Promise<typescript.CompletionInfo | undefined>`
          */
         getCompletionsAtPosition(fileName: string, position: number): Promise<any | undefined>;
-
         /**
          * Get code completion details for the given file, position, and entry.
          * @returns `Promise<typescript.CompletionEntryDetails | undefined>`
@@ -8278,7 +8259,6 @@ declare namespace monaco.languages.typescript {
          * @returns `Promise<typescript.QuickInfo | undefined>`
          */
         getQuickInfoAtPosition(fileName: string, position: number): Promise<any | undefined>;
-
         /**
          * Get other ranges which are related to the item at the given position in the file (often used for highlighting).
          * @returns `Promise<ReadonlyArray<typescript.ReferenceEntry> | undefined>`
@@ -8294,20 +8274,17 @@ declare namespace monaco.languages.typescript {
          * @returns `Promise<typescript.ReferenceEntry[] | undefined>`
          */
         getReferencesAtPosition(fileName: string, position: number): Promise<any[] | undefined>;
-
         /**
          * Get outline entries for the item at the given position in the file.
          * @returns `Promise<typescript.NavigationBarItem[]>`
          */
         getNavigationBarItems(fileName: string): Promise<any[]>;
-
         /**
          * Get changes which should be applied to format the given file.
          * @param options `typescript.FormatCodeOptions`
          * @returns `Promise<typescript.TextChange[]>`
          */
         getFormattingEditsForDocument(fileName: string, options: any): Promise<any[]>;
-
         /**
          * Get changes which should be applied to format the given range in the file.
          * @param options `typescript.FormatCodeOptions`
@@ -8331,13 +8308,11 @@ declare namespace monaco.languages.typescript {
          * @returns `Promise<typescript.RenameInfo>`
          */
         getRenameInfo(fileName: string, positon: number, options: any): Promise<any>;
-
         /**
          * Get transpiled output for the given file.
          * @returns `typescript.EmitOutput`
          */
-        getEmitOutput(fileName: string): Promise<any>;
-
+        getEmitOutput(fileName: string): Promise<EmitOutput>;
         /**
          * Get possible code fixes at the given position in the file.
          * @param formatOptions `typescript.FormatCodeOptions`
@@ -8351,12 +8326,9 @@ declare namespace monaco.languages.typescript {
          */
         provideInlayHints(fileName: string, start: number, end: number): Promise<ReadonlyArray<any>>;
     }
-
     export const typescriptVersion: string;
-
     export const typescriptDefaults: LanguageServiceDefaults;
     export const javascriptDefaults: LanguageServiceDefaults;
-
     export const getTypeScriptWorker: () => Promise<(...uris: Uri[]) => Promise<TypeScriptWorker>>;
     export const getJavaScriptWorker: () => Promise<(...uris: Uri[]) => Promise<TypeScriptWorker>>;
 }
